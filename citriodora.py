@@ -72,5 +72,5 @@ for obj in parsed_yaml:
                 break
         print('<div class="item"><a href="{}"><img src="{}" title="{}"></a><span class="caption">{}</span></div>'.format(item['url'], icon, item['url'], item['name']))
     except Exception as e:
-        print('<div class="item"><a href="{}"><div class="dead" title="{}"></div></a><span class="caption">{}</span></div>'.format(item['url'], item['url'], item['name']))
+        print('<div class="item"><a href="{}"><img src="static.gif" title="{}"></a><span class="caption">{}</span></div>'.format(item['url'], item['url'], item['name']))
 print("</body></html>")
