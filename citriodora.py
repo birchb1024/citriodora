@@ -1,12 +1,21 @@
 
+# sudo /usr/local/bin/pip3 --cert /etc/ssl/certs/tls-ca-bundle.pem install favicon
+
+# $ CURL_CA_BUNDLE="" python36 citriodora.py <coles-sites.yaml  > foo.html
+
+
+import os
+import re
 import sys
 import yaml
 import string
-import favicon
 
 from pprint import pprint
 from urllib.parse import urlparse
 
+ # https://stackoverflow.com/questions/48391750/disable-python-requests-ssl-validation-for-an-imported-module
+
+import favicon
 
 parsed_yaml = yaml.load(sys.stdin, Loader=yaml.FullLoader)
 print("<html><body>")
@@ -52,14 +61,16 @@ for obj in parsed_yaml:
 
     u = urlparse(item['url'])
     if item['name'] == item['url']:
-        item['name'] = u.netloc
+        item['name'] = u.hostname
     
-    common = ['org', 'com', 'www', 'au', 'net']
-    nt = item['name'].split('.')
+    common = ['org', 'com', 'www', 'au', 'net', 'cmltd']
+    nt = re.split('[\.:/]', item['name'])
     nn = [x for x in nt if not x in common]
-    item['name'] = string.capwords('.'.join(nn))
+#    item['name'] = string.capwords(' '.join(nn))
+    item['name'] = ' '.join(nn)
     try:
-        print([item, type(item)], file=sys.stderr)
+        pprint(item, stream=sys.stderr)
+        sys.stderr.flush()
         fi = favicon.get(item['url'])
         icon = fi[0].url
         for X in fi:
@@ -72,5 +83,6 @@ for obj in parsed_yaml:
                 break
         print('<div class="item"><a href="{}"><img src="{}" title="{}"></a><span class="caption">{}</span></div>'.format(item['url'], icon, item['url'], item['name']))
     except Exception as e:
+        print(e, file=sys.stderr)
         print('<div class="item"><a href="{}"><img src="static.gif" title="{}"></a><span class="caption">{}</span></div>'.format(item['url'], item['url'], item['name']))
 print("</body></html>")
